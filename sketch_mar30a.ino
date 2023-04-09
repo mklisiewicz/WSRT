@@ -5,7 +5,7 @@ int lastValue = 60;
 int dmax = 0;
 unsigned long currentTime;
 unsigned long start;
-int RPM;
+float RPM;
 int dt;
 int dv;
 
