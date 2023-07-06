@@ -8,6 +8,7 @@
 #include "hardware/adc.h"
 #include "hardware/i2c.h"
 #include <cstdlib>
+#include <cstring>
 #include <cmath>
 
 #define millis() to_ms_since_boot(get_absolute_time())
@@ -29,11 +30,10 @@ int main(){
     __uint16_t stateChange;
 
     int pulse = 0;
-    float wheelDiameter = 1.25;
     float rpm;
-    float conversionFactor = M_PI*60*wheelDiameter;
 
-    uint8_t txdata[2];
+
+    uint8_t txdata[4];
 
     i2c_init(i2c0, 100000);
     i2c_set_slave_mode(i2c0, true, I2C_ADDR);
@@ -55,10 +55,8 @@ int main(){
             rpm = (pulse*120)/15;
             pulse = 0;
             start = currentTime;
-            int speed = rpm * conversionFactor;
-            txdata[0] = speed & 0xFF;
-            txdata[1] = speed >> 8;
-            i2c_write_raw_blocking(i2c0, txdata, 2);
+            std::memcpy(txdata, &rpm, 4);
+            i2c_write_raw_blocking(i2c0, txdata, 4);
         }
     }
 }
