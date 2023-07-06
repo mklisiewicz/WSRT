@@ -29,7 +29,7 @@ int main(){
     __uint16_t stateChange;
 
     int pulse = 0;
-    int wheelDiameter = 1.25;
+    float wheelDiameter = 1.25;
     float rpm;
     float conversionFactor = M_PI*60*wheelDiameter;
 
