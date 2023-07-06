@@ -56,6 +56,8 @@ int main(){
             pulse = 0;
             start = currentTime;
             int speed = rpm * conversionFactor;
+            txdata[0] = speed & 0xFF;
+            txdata[1] = speed >> 8;
             i2c_write_raw_blocking(i2c0, txdata, 2);
         }
     }
