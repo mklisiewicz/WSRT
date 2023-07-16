@@ -7,56 +7,64 @@
 #include "hardware/regs/dreq.h"
 #include "hardware/adc.h"
 #include "hardware/i2c.h"
+#include "hardware/irq.h"
 #include <cstdlib>
 #include <cstring>
 #include <cmath>
 
-#define millis() to_ms_since_boot(get_absolute_time())
-
+#define micros() to_us_since_boot(get_absolute_time())
+#define SENSOR_PIN 4
 #define I2C_ADDR 0x3E
+#define SDA_PIN 0
+#define SCL_PIN 1
 
-int main(){
-    stdio_init_all();
-    adc_init();
-    adc_gpio_init(26);
-    adc_select_input(0);
+float deltaTime;
+float start;
+float rpm = 0;
+int pulse = 0;
 
-    __uint32_t start = millis();
-    __uint32_t currentTime;
-    __uint32_t deltaTime;
+void calculateRPM(uint32_t time){
+    rpm = (pow(10, 6)*60)/(5*time);
+}
 
-    __uint16_t currentState;
-    __uint16_t lastState;
-    __uint16_t stateChange;
+void sensorInterrupt(uint gpio, uint32_t events){
+    pulse++;
+    if(pulse == 3){
+        deltaTime = micros() - start;
+        start = micros();
+        pulse = 0;
+        calculateRPM(deltaTime);
+        printf("RPM: %f\n", rpm);
+    }   
+}
 
-    int pulse = 0;
-    float rpm;
+void setupInterrupt(){
+    gpio_set_irq_enabled_with_callback(SENSOR_PIN, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true, &sensorInterrupt);
+}
 
-
-    uint8_t txdata[4];
-
+void setupI2C(){
     i2c_init(i2c0, 100000);
     i2c_set_slave_mode(i2c0, true, I2C_ADDR);
-    gpio_set_function(0 ,GPIO_FUNC_I2C);
-    gpio_set_function(1 ,GPIO_FUNC_I2C);
-    gpio_pull_up(0);
-    gpio_pull_up(1);
+    gpio_set_function(SDA_PIN ,GPIO_FUNC_I2C);
+    gpio_set_function(SCL_PIN ,GPIO_FUNC_I2C);
+    gpio_pull_up(SDA_PIN);
+    gpio_pull_up(SCL_PIN);
+}
+
+void setupSensor(){
+    gpio_init(SENSOR_PIN);
+    gpio_set_dir(SENSOR_PIN, GPIO_IN);
+}
+
+int main(){
+    uint8_t txdata[4];
+    stdio_init_all();
+    setupI2C();
+    setupSensor();
+    setupInterrupt();
 
     while(true){
-        currentState = adc_read();
-        currentTime = millis();
-        stateChange = abs(currentState - lastState);
-        deltaTime = currentTime - start;
-        if (stateChange > 30) {
-            pulse++;
-        }
-        lastState = currentState;
-        if(deltaTime >= 500){
-            rpm = (pulse*120)/15;
-            pulse = 0;
-            start = currentTime;
-            std::memcpy(txdata, &rpm, 4);
-            i2c_write_raw_blocking(i2c0, txdata, 4);
-        }
+        std::memcpy(txdata, &rpm, 4);
+        i2c_write_raw_blocking(i2c0, txdata, 4);
     }
 }
