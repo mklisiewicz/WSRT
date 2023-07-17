@@ -33,7 +33,6 @@ bool check = false;
 
 static struct{
 uint8_t tx[4];
-uint8_t test[4] = {1,2,3,4};
 uint8_t tx_pos = 0;
 } context;
 /////////////////////////// I2C ///////////////////////////
@@ -79,7 +78,7 @@ void sensorInterrupt(uint gpio, uint32_t events){
 }
 
 void setupInterrupt(){
-    gpio_set_irq_enabled_with_callback(SENSOR_PIN, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true, &sensorInterrupt);
+    gpio_set_irq_enabled_with_callback(SENSOR_PIN, GPIO_IRQ_EDGE_RISE, true, &sensorInterrupt);
 }
 
 void setupSensor(){
