@@ -65,7 +65,7 @@ static void setupI2C(){
 
 /////////////////////////// SENSOR ///////////////////////////
 void calculateRPM(uint32_t time){
-    rpm = (pow(10, 6)*60)/(5*time);
+    rpm = (pow(10, 7)*6)/(5*time);
 }
 
 void sensorInterrupt(uint gpio, uint32_t events){
