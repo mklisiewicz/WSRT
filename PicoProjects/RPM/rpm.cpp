@@ -95,7 +95,6 @@ int main(){
     setupInterrupt();
 
     while(true){
-        printf("RPM: %f\n", rpm);
         //Set RPM to 0 if no pulse is detected for 500ms
         if(millis() - rstTime > 500){
             if (!check){
