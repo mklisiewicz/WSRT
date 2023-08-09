@@ -7,10 +7,17 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <chrono>
+#include <algorithm>
 
 
 #define RCV_ADDR 0x42
 #define RTCM3_PREAMBLE 0xD3
+#define NMEA_PREAMBLE 0x24
+#define ENDLINE 0x0A
+
+const uint8_t USB_SET[]{
+    0xB5, 0x62, 0x06, 0x8A, 0x18, 0x00, 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x78, 0x10, 0x01, 0x01, 0x00, 0x78, 0x10, 0x01, 0x02, 0x00, 0x78, 0x10, 0x01, 0x01, 0x00, 0x77, 0x10, 0x01, 0xD1, 0x28, 0x00, 0x00
+};
 
 const uint8_t DISABLE_UART1[] = {
     0xB5, 0x62, 0x06, 0x00, 0x14, 0x00,
@@ -72,7 +79,7 @@ const uint8_t SET_RATE_BDS[] = {
 };
 
 const uint8_t SET_I2C_OUT[] = {
-    
+
 };
 
 const uint8_t SET_I2C_IN[] = {
@@ -82,13 +89,14 @@ const uint8_t SET_I2C_IN[] = {
 const uint8_t* commands[] = {
     DISABLE_UART1,
     DISABLE_UART2,
-    DISABLE_USB,
+    //DISABLE_USB,
     DISABLE_SPI,
     SET_RATE_UTC,
     SET_RATE_GPS,
     SET_RATE_GAL,
     SET_RATE_GLO,
-    SET_RATE_BDS
+    SET_RATE_BDS,
+    USB_SET
 };
 
 
@@ -105,63 +113,58 @@ unsigned long millis() {
 }
 
 void write_to_file(uint8_t *ptr, size_t len) {
-    std::ofstream output_file("/home/mateusz/gps/nmea_messages.txt", std::ios::app);
+    std::ofstream output_file("/home/mateusz/gps/nmea_messages.csv", std::ios::app);
     output_file.write((char*)ptr, len);
     output_file.close();
 }
 
 int i2cOpen() {
-    int i2cHandle = open("/dev/i2c-1", O_RDWR);
-    if (i2cHandle < 0) {
+    int i2cHandle; 
+    while ((i2cHandle = open("/dev/i2c-1", O_RDWR))<0){
         std::cerr << "Failed to open I2C device." << std::endl;
-        return -1;
     }
     return i2cHandle;
 }
 
 void i2cSetAddress(int i2cHandle) {
-    if (ioctl(i2cHandle, I2C_SLAVE, RCV_ADDR) < 0) {
+    while (ioctl(i2cHandle, I2C_SLAVE, RCV_ADDR) < 0) {
         std::cerr << "Failed to set I2C address." << std::endl;
     }
 }
 
-void i2cWrite(const std::vector<uint8_t>& data, int i2cHandle) {
+void i2cWrite(const std::vector<uint8_t> data, int i2cHandle) {
     if (write(i2cHandle, data.data(), data.size()) != data.size()) {
         std::cerr << "Failed to send I2C data." << std::endl;
     }
 }
 
 void readRTCM(int i2cHandle) {
-    std::vector<uint8_t> rtcm_data;
-    uint8_t rtcm_byte;
-    uint8_t rtcm_bytes[1024];
-    if (std::cin.get(reinterpret_cast<char&>(rtcm_byte)) && rtcm_byte == RTCM3_PREAMBLE) {
+    std::vector<uint8_t> rtcm_bytes;
+    char rtcm_byte;
+    if (std::cin.get(rtcm_byte) && rtcm_byte == RTCM3_PREAMBLE) {
         std::string line;
         std::getline(std::cin, line, '\n');  
-        std::cout << sizeof(line) << std::endl;
+        std::cout << line.length() << std::endl;
         for (char c : line) {
-            rtcm_data.push_back(static_cast<uint8_t>(c));
+            rtcm_bytes.push_back(reinterpret_cast<uint8_t&>(c));
         }
-
-        i2cWrite(rtcm_data, i2cHandle);
+        i2cWrite(rtcm_bytes, i2cHandle);
     }
 }
 
 void readNMEA(int i2cHandle) {
-    uint8_t received_data[96];
+    uint8_t received_bytes[92] = {'$'};
     uint8_t received_byte;
-    int i = 0;
-    static unsigned long startTime = 0; 
-    unsigned long endTime = 0; 
+    int i = 1;
 
-    if (read(i2cHandle, &received_byte, 1) == 1 && received_byte == '$') {
-        while(read(i2cHandle, &received_byte, 1) == 1 && received_byte != '\n') {
-            received_data[i] = received_byte;
+    if (read(i2cHandle, &received_byte, 1) == 1 && received_byte == NMEA_PREAMBLE) {
+        while(read(i2cHandle, &received_byte, 1) == 1 && received_byte != ENDLINE && received_byte > 0x20) {
+            received_byte &= ~(1 << 7);
+            received_bytes[i] = received_byte;
             i++;
         }
-        received_data[i] = '\n';
-        std::cout << i << std::endl;
-        write_to_file(received_data, i+1);
+        received_bytes[i] = ENDLINE;
+        write_to_file(received_bytes, i+1);
     }
 }
 
@@ -170,8 +173,7 @@ int setup() {
     int i2cHandle = i2cOpen();
     i2cSetAddress(i2cHandle);
     sendConfig(i2cHandle);
-    while (millis() - startTime < 1000)
-    {
+    while (millis() - startTime < 1000){
         std::cout << "Waiting for GPS to start..." << std::endl;
     }
     return i2cHandle;
