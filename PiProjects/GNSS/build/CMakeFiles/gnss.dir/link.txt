@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/gnss.dir/src/config.cpp.o CMakeFiles/gnss.dir/src/i2c.cpp.o CMakeFiles/gnss.dir/src/main.cpp.o CMakeFiles/gnss.dir/src/protocol.cpp.o -o gnss 

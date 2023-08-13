@@ -1,0 +1,3 @@
+/home/mateusz/gps/build/CMakeFiles/edit_cache.dir
+/home/mateusz/gps/build/CMakeFiles/rebuild_cache.dir
+/home/mateusz/gps/build/CMakeFiles/gnss.dir
