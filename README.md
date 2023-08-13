@@ -1,8 +1,6 @@
 # WUT SiMR Racing Technology
 
-
-![Wutsimr Racing Technology Logo](assets/wsrt_logo.png)
-
+<img src="assets/wsrt_logo.png" alt="Wutsimr Racing Technology Logo" width="600"/>
 This repository contains the software components developed for WUT SiMR Racing Technology student motorcycle project.
 
 ## Introduction
