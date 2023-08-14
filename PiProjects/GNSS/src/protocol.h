@@ -15,8 +15,8 @@
 #define N_SAT 7
 #define HDOP 8
 #define ORTHO_HEIGHT 9
-#define SPEED 8
-#define COURSE 9
+#define SPEED 7
+#define COURSE 8
 
 double millis();
 
@@ -26,6 +26,6 @@ std::string decodeCords(std::string cord);
 
 std::vector<std::string> processMessage(std::string msg);
 
-std::vector<std::string> readNMEA(int i2cHandle);
+void readNMEA(int i2cHandle);
 
 void sendRTCM(int i2cHandle);

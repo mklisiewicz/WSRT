@@ -2,6 +2,9 @@
 #include <vector>
 #include <string>
 #include <unistd.h>
+#include <fstream>
+#include <chrono>
+#include <fcntl.h>
 #include <linux/i2c-dev.h>
 #include <sys/ioctl.h>
 #include "protocol.h"
@@ -16,13 +19,13 @@ double millis() {
 }
 
 void write_to_file(std::vector<std::string> msg_vector) {
-    std::ofstream output_file("/home/catreson/dane_test/nmea_messages" + std::to_string(timestamp) + ".csv", std::ios::app);
-    output_file<<std::to_string(millis());
-    output_file<<',';
+    std::ofstream output_file("/home/mateusz/gps/nmea" + std::to_string(timestamp) + ".csv", std::ios::app);
+
     for (int i = 0; i < msg_vector.size(); i++) {
-        output_file << millis();
-        output_file << ",";
         output_file << msg_vector[i];
+        if (i != msg_vector.size() - 1) {
+            output_file << ",";
+        }
     }
     output_file.close();
 }
@@ -64,28 +67,27 @@ std::vector<std::string> processMessage(std::string msg) {
         msg_vector[LONGITUDE] = decodeCords(msg_vector[LONGITUDE]);
         msg_vector[LATITUDE] = decodeCords(msg_vector[LATITUDE]);
         
+        prcsd_msg_vector.push_back(std::to_string(millis()));
+
         prcsd_msg_vector.push_back(msg_vector[UTC]);
         prcsd_msg_vector.push_back(msg_vector[LONGITUDE]);
         prcsd_msg_vector.push_back(msg_vector[LATITUDE]);
         prcsd_msg_vector.push_back(msg_vector[N_SAT]);
         prcsd_msg_vector.push_back(msg_vector[HDOP]);
         prcsd_msg_vector.push_back(msg_vector[MODE]);
-        prcsd_msg_vector.push_back(msg_vector[ORTHO_HEIGHT]);
-        prcsd_msg_vector.push_back(",");
+        prcsd_msg_vector.push_back(msg_vector[ORTHO_HEIGHT] + ",");
     }
     else {
         prcsd_msg_vector.push_back(msg_vector[SPEED]);
-        prcsd_msg_vector.push_back(msg_vector[COURSE]);
-        prcsd_msg_vector.push_back(msg_vector[ENDLINE]);
-
+        prcsd_msg_vector.push_back(msg_vector[COURSE]+"\n");
     }
     return prcsd_msg_vector;
 }
 
-std::vector<std::string> readNMEA(int i2cHandle) {
+void readNMEA(int i2cHandle) {
     std::string received_bytes;
     uint8_t received_byte;
-
+/*
     if (read(i2cHandle, &received_byte, 1) == 1 && received_byte == NMEA_PREAMBLE) {
         received_bytes.push_back(received_byte);
 
@@ -93,8 +95,11 @@ std::vector<std::string> readNMEA(int i2cHandle) {
             received_byte &= ~(1 << 7);
             received_bytes.push_back(received_byte);
         }
-    }
-    write_to_file(processMessage(received_bytes));
+    }*/
+    std::string line1 = "$GNGNS,055504.85,5207.06610,N,02051.21600,E,AAAANN,25,0.70,114.5,34.6,,,V*1C";
+    std::string line2 = "$GPRMC,123519,A,4807.038,N,01131.000,E,0.022,269.131,230394,,,A,C*6A";
+    write_to_file(processMessage(line1));
+    write_to_file(processMessage(line2));
 }
 
 void sendRTCM(int i2cHandle) {
