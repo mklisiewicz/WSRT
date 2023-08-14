@@ -4,10 +4,11 @@
 This repository contains the software components developed for WUT SiMR Racing Technology student motorcycle project.
 
 ## Introduction
-<img src="assets/wsrt_bike.jpeg" alt="Wutsimr Racing Technology Bike"/>
+
 Since 2017, WSRT has been operating as a collaboration between students from the Warsaw University of Technology and the Academy of Fine Arts in Warsaw.
 We specialize in the design, research, and creation of all things related to motorcycle racing. 
 This project is the first racing motorcycle in Poland designed according to the regulations of the academic MotoStudent series.
+<img src="assets/wsrt_bike.jpeg" alt="Wutsimr Racing Technology Bike"/>
 
 ## Features
 
