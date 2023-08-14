@@ -1,5 +1,5 @@
 # GNSS Software Description
-GNSS directory provides a C++ program tailored for Raspberry Pi-based projects, focusing on interacting with the ZED-F9P GNSS receiver using I2C communication. It offers capabilities for writing RTCM messages, essential for accurate RTK corrections, and reading NMEA messages that contain crucial positional and timing information in a standardized format.
+GNSS directory provides a C++ program tailored for Raspberry Pi-based projects, focusing on interacting with the ZED-F9P GNSS receiver using I2C communication. It offers capabilities for writing RTCM messages, essential for accurate RTK corrections, and reading NMEA messages that contain crucial positional and timing information in a standardized format, all on the same I2C bus.
 ## Features
 
 - **RTCM Message Writing:** Transmit RTCM messages to the ZED-F9P GNSS receiver using I2C communication for real-time kinematic (RTK) correction data.
