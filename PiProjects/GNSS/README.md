@@ -25,5 +25,5 @@ The provided `gnss` binary is designed to work in conjunction with [RTKLIB's `st
 3. Run the gnss binary with RTKLIB's str2str utility for writing RTCM messages to the receiver and saving NMEA messages to a file specified in protocol.cpp:
 
     ```bash
-    str2str -in ntrip://[username]:[password]@ntripserver:[port]/[access_point] | path/to/gnss/build/gnss 
+    str2str -in ntrip://[username]:[password]@[ntripserver]:[port]/[access_point] | path/to/gnss/build/gnss 
     ```
