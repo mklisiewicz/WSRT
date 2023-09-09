@@ -22,7 +22,9 @@ Before running the project, make sure you have the following prerequisites insta
 1. Download this directory, then:
 
 ```bash
-cd path/to/SpeedSensor/build
+cd path/to/SpeedSensor
+mkdir build
+cd build
 cmake ..
 make
 ```
