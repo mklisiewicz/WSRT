@@ -3,10 +3,6 @@
 ## Overview
 
 This directory contains C++ project used for reading speed sensor data from a Raspberry Pi Pico board embedded within motorcycles magnetoresistive sensors.
-## Table of Contents
-
-- [Requirements](#requirements)
-- [Installation](#installation)
 
 ## Requirements
 
