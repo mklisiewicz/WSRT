@@ -15,7 +15,7 @@ int main() {
         return 1;
     }
     getConfig();
- //   mqtt::topic wheelTopic = setup_mqtt();
+    mqtt::topic wheelTopic = setup_mqtt();
     unsigned long start = getMillis();
 
     while (true) {
@@ -23,8 +23,8 @@ int main() {
             std::pair<float, float> values = readData();
             std::cout << values.first << std::endl;
             std::cout << values.second << std::endl;
-      //      write_mqtt(values.first, FRONT, wheelTopic);
-       //     write_mqtt(values.second, REAR, wheelTopic);
+            write_mqtt(values.first, FRONT, wheelTopic);
+            write_mqtt(values.second, REAR, wheelTopic);
             start = getMillis();
         }
     }
