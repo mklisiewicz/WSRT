@@ -23,6 +23,7 @@ Before running the project, make sure you have the following prerequisites insta
 
 ```bash
 cd path/to/SpeedSensor/build
+cmake ..
 make
 ```
 
