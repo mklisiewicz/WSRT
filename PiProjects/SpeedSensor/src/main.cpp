@@ -21,8 +21,6 @@ int main() {
     while (true) {
         if (getMillis() - start > 20){
             std::pair<float, float> values = readData();
-            std::cout << values.first << std::endl;
-            std::cout << values.second << std::endl;
             write_mqtt(values.first, FRONT, wheelTopic);
             write_mqtt(values.second, REAR, wheelTopic);
             start = getMillis();
