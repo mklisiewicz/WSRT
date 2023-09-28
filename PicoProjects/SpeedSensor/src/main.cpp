@@ -26,12 +26,10 @@ static void i2cHandler(i2c_inst_t *i2c, i2c_slave_event_t event) {
 
 static void setupI2C() {
     gpio_init(SDA_PIN);
-    gpio_pull_up(SDA_PIN);
     gpio_set_function(SDA_PIN, GPIO_FUNC_I2C);
 
     gpio_init(SCL_PIN);
     gpio_set_function(SCL_PIN, GPIO_FUNC_I2C);
-    gpio_pull_up(SCL_PIN);
 
     i2c_init(i2c0, I2C_BAUDRATE);
     i2c_slave_init(i2c0, I2C_ADDR, &i2cHandler);

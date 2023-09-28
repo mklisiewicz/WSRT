@@ -18,7 +18,7 @@
 #define REAR_SENSOR_PIN 2
 #define REAR_SENSOR_REF 4
 #define FRONT_SENSOR_PIN 29
-#define FRONT_SENSOR_REF 28
+#define FRONT_SENSOR_REF 27
 
 #define micros() to_us_since_boot(get_absolute_time())
 #define millis() to_ms_since_boot(get_absolute_time())
